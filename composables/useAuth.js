@@ -36,7 +36,7 @@ export default function useAuth() {
     auth.signOut().then(() => {});
   }
 
-  function signUp({ email, password }) {
+  function signUp({ email, password, name }) {
     const validatedData = useAuthValidator({ email, password, name }, "signup");
     setPersistence(auth, "LOCAL").then(() => {
       createUserWithEmailAndPassword(auth, email, password).then(
