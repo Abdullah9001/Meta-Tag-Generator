@@ -9,13 +9,19 @@ import {
 import useFirebase from "./userFirebase";
 
 export default function useAuth() {
-  const user = useState("userState", () => ({}));
+  const user = useState("userState", () => {});
+  const errorBag = ref("errorBag", () => ({
+    email: null,
+    password: null,
+    name: null,
+  }));
 
   const { app } = useFirebase;
 
   const auth = getAuth(app);
 
   function login(email, password) {
+    const validatedData = useAuthValidator({ email, password }, "login");
     setPersistence(auth, "LOCAL").then(() => {
       signInWithEmailAndPassword(auth, email, password).then((userDtails) => {
         user.value == userDtails.user;
@@ -30,7 +36,8 @@ export default function useAuth() {
     auth.signOut().then(() => {});
   }
 
-  function signUp() {
+  function signUp({ email, password }) {
+    const validatedData = useAuthValidator({ email, password, name }, "signup");
     setPersistence(auth, "LOCAL").then(() => {
       createUserWithEmailAndPassword(auth, email, password).then(
         (userDtails) => {
@@ -42,5 +49,5 @@ export default function useAuth() {
       );
     });
   }
-  return { user, login, signUp, logout };
+  return { user, login, signUp, logout, errorBag };
 }
